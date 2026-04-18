@@ -39,9 +39,9 @@ run-tests: test
 clean:
 	rm -f $(PROD_BIN) $(TEST_BIN)
 
-Usage:
-
-$ make               # builds both math_app and test_runner
-$ ./math_app         # runs production app (if main.c exists)
-$ make run-tests     # builds & runs all unit tests
-$ make clean         # remove binaries
+# Usage:
+# 
+# $ make               # builds both math_app and test_runner
+# $ ./math_app         # runs production app (if main.c exists)
+# $ make run-tests     # builds & runs all unit tests
+# $ make clean         # remove binaries
