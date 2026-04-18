@@ -1,5 +1,6 @@
 #include <stdio.h>
+#include "board.h"
 
-void main() {
-    printf("Chess!\n");
+void print_legal_moves() {
+    printf("Legal moves!\n");
 }

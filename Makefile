@@ -15,7 +15,7 @@ TEST_BIN  := Test_Chess
 
 .PHONY: all production test run-tests clean
 
-all: production test
+all: production test run-tests
 
 # Build production executable
 
@@ -26,7 +26,7 @@ production: $(PROD_SRCS)
 
 # Build test runner (includes math_utils.c + test file)
 
-test: $(SRC)/math_utils.c $(TEST_SRCS)
+test: $(SRC)/board.c $(TEST_SRCS)
 	$(CC) $(CFLAGS) $^ -o $(TEST_BIN)
 
 # Note: $^ stands for the names of the prerequisites separated by spaces. In this case $(SRC)/math_utils.c $(TEST_SRCS)
@@ -35,6 +35,9 @@ test: $(SRC)/math_utils.c $(TEST_SRCS)
 
 run-tests: test
 	./$(TEST_BIN)
+
+run: production
+	./$(PROD_BIN)
 
 clean:
 	rm -f $(PROD_BIN) $(TEST_BIN)
