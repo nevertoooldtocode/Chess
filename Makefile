@@ -37,7 +37,7 @@ run-tests: test
 	./$(TEST_BIN)
 
 clean:
-rm -f $(PROD_BIN) $(TEST_BIN)
+	rm -f $(PROD_BIN) $(TEST_BIN)
 
 Usage:
 
