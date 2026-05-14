@@ -8,6 +8,7 @@ int main() {
     board startposition;
     for (i = 0; i < 120; i++) startposition[i] = i;
 
+    print_mailbox(startposition);
     print_board(startposition);
     print_legal_moves();
     return 0;
