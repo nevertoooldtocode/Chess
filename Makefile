@@ -6,12 +6,14 @@ CFLAGS  := -Iinclude -Wall -Wextra
 SRC     := src
 INC     := include
 TEST    := tests
+BIN	:= bin
 
-PROD_SRCS := $(SRC)/main.c $(SRC)/board.c
+PROD_SRCS := $(SRC)/main.c 
+INC_SRCS  := $(SRC)/board.c
 TEST_SRCS := $(TEST)/test_board.c
 
-PROD_BIN  := Chess
-TEST_BIN  := Test_Chess
+PROD_BIN  := $(BIN)/Chess
+TEST_BIN  := $(BIN)/Test_Chess
 
 .PHONY: all production test run-tests clean
 
@@ -19,14 +21,14 @@ all: production test run-tests
 
 # Build production executable
 
-production: $(PROD_SRCS)
+production: $(PROD_SRCS) $(INC_SRCS)
 	$(CC) $(CFLAGS) $^ -o $(PROD_BIN)
 
 # Note: $^ stands for the names of the prerequisites separated by spaces. In this case $(PROD_SRCS)
 
 # Build test runner (includes math_utils.c + test file)
 
-test: $(SRC)/board.c $(TEST_SRCS)
+test: $(TEST_SRCS) $(INC_SRCS) 
 	$(CC) $(CFLAGS) $^ -o $(TEST_BIN)
 
 # Note: $^ stands for the names of the prerequisites separated by spaces. In this case $(SRC)/math_utils.c $(TEST_SRCS)
