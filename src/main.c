@@ -4,9 +4,10 @@
 #include "board.h"
 
 int main() {
-    int i;
-    board startposition;
-    for (i = 0; i < 120; i++) startposition[i] = i;
+    //int i;
+    board_t startposition = {0};
+    //for (i = 0; i < 120; i++) startposition[i] = i;
+    init_oob(startposition);
 
     print_mailbox(startposition);
     print_board(startposition);
