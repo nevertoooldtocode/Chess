@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "board.h"
 
 #define BOARDSIZE 64
@@ -21,14 +22,41 @@ const field_t OOBINDEX[OOBSIZE] = {
     100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 
     110, 111, 112, 113, 114, 115, 116, 117, 118, 119};
 
+board_t create_board() {
+    board_t b;
+    b = (board_t) malloc(MAILBOXSIZE * sizeof(field_t));
+    if (b == NULL) {
+	printf("error in create_board\n");
+	exit(1);
+    }
+    init_oob(b);
+    return b;
+}
+
+void destroy_board(board_t b) {
+    free(b);
+}
 void init_oob(board_t b) {
     int i;
     for (i = 0; i < OOBSIZE; i++)
 	b[OOBINDEX[i]] = -1;
+    for (i = 0; i < BOARDSIZE; i++)
+	b[FIELDINDEX[i]] = 0;
 }
 
 int place_piece(board_t b, color_t c, piece_t p, field_t f) {
+    b[f] &= 0xf0; // Make empty
+    b[f] |= (c << 3);
+    b[f] |= p;
     return 0;
+}
+
+board_t create_board_from_fen(char* fen) {
+    board_t b = create_board();
+    place_piece(b, White, Queen, 24);
+    place_piece(b, Black, Queen, 94);
+    printf("fen: %s\n", fen);
+    return b;
 }
 
 void print_mailbox(board_t b) {
@@ -36,7 +64,7 @@ void print_mailbox(board_t b) {
     int r, c;
     for (r = 11; r >= 0; r--) {
 	for (c = 0; c < 10; c++)
-	    printf("%d, ", b[10*r + c]);
+	    printf("%2d ", b[10*r + c]);
 	printf("\n");
 	}
     printf("\n");

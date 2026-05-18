@@ -4,14 +4,24 @@
 #include "board.h"
 
 int main() {
-    //int i;
-    board_t startposition = {0};
-    //for (i = 0; i < 120; i++) startposition[i] = i;
-    init_oob(startposition);
+    board_t startposition = create_board();
+    //init_oob(startposition);
 
     print_mailbox(startposition);
-    print_board(startposition);
+    //print_board(startposition);
     print_legal_moves();
+
+    place_piece(startposition, White, King, 25);
+    place_piece(startposition, Black, King, 95);
+    print_mailbox(startposition);
+    //print_board(startposition);
+    destroy_board(startposition);
+
+    startposition = create_board_from_fen("Kk");
+    print_mailbox(startposition);
+
+    destroy_board(startposition);
+
     return 0;
 }
 
