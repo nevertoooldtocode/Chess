@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include "board.h"
 
 #define BOARDSIZE 64
@@ -22,6 +24,18 @@ const field_t OOBINDEX[OOBSIZE] = {
     100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 
     110, 111, 112, 113, 114, 115, 116, 117, 118, 119};
 
+const char PIECENAME[15] = {
+    ' ', 'P', 'N', 'B', 'R', 'Q', 'K', ' ',
+    ' ', 'p', 'n', 'b', 'r', 'q', 'k'};
+
+static char find_piecename(char p) {
+    int i;
+    for (i = 0; i < 15; i++) 
+	if (p == PIECENAME[i])
+	    return (char) i;
+    return ' ';
+}
+
 board_t create_board() {
     board_t b;
     b = (board_t) malloc(MAILBOXSIZE * sizeof(field_t));
@@ -39,7 +53,7 @@ void destroy_board(board_t b) {
 void init_oob(board_t b) {
     int i;
     for (i = 0; i < OOBSIZE; i++)
-	b[OOBINDEX[i]] = -1;
+	b[OOBINDEX[i]] = -128;
     for (i = 0; i < BOARDSIZE; i++)
 	b[FIELDINDEX[i]] = 0;
 }
@@ -53,8 +67,14 @@ int place_piece(board_t b, color_t c, piece_t p, field_t f) {
 
 board_t create_board_from_fen(char* fen) {
     board_t b = create_board();
-    place_piece(b, White, Queen, 24);
-    place_piece(b, Black, Queen, 94);
+    int i = 0, f = 63;
+    while (fen[i] != ' ' && i < (int) strlen(fen)) {
+	if (fen[i] == '/');
+	else if (isdigit(fen[i])) 
+	    f -= (fen[i] - 48);
+	else b[FIELDINDEX[f--]] = find_piecename(fen[i]);
+	i++;
+    }
     printf("fen: %s\n", fen);
     return b;
 }
@@ -64,7 +84,7 @@ void print_mailbox(board_t b) {
     int r, c;
     for (r = 11; r >= 0; r--) {
 	for (c = 0; c < 10; c++)
-	    printf("%2d ", b[10*r + c]);
+	    printf("%4d ", b[10*r + c]);
 	printf("\n");
 	}
     printf("\n");
@@ -75,7 +95,7 @@ void print_board(board_t b) {
     int r, c;
     for (r = 7; r >= 0; r--) {
 	for (c = 0; c < 8; c++)
-	    printf("%d, ", b[FIELDINDEX[8*r + c]]);
+	    printf("%c ", PIECENAME[b[FIELDINDEX[8*r + c]]]);
 	printf("\n");
     }
     printf("\n");

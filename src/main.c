@@ -4,6 +4,7 @@
 #include "board.h"
 
 int main() {
+    /*
     board_t startposition = create_board();
     //init_oob(startposition);
 
@@ -16,10 +17,10 @@ int main() {
     print_mailbox(startposition);
     //print_board(startposition);
     destroy_board(startposition);
-
-    startposition = create_board_from_fen("Kk");
+*/
+    board_t startposition = create_board_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     print_mailbox(startposition);
-
+    print_board(startposition);
     destroy_board(startposition);
 
     return 0;

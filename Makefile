@@ -2,6 +2,7 @@
 
 CC      := gcc
 CFLAGS  := -Iinclude -Wall -Wextra
+DBFLAGS	:= -g
 
 SRC     := src
 INC     := include
@@ -17,12 +18,15 @@ TEST_BIN  := $(BIN)/Test_Chess
 
 .PHONY: all production test run-tests clean
 
-all: production test run-tests
+all: production test run-tests debug
 
 # Build production executable
 
 production: $(PROD_SRCS) $(INC_SRCS)
 	$(CC) $(CFLAGS) $^ -o $(PROD_BIN)
+
+debug: $(PROD_SRCS) $(INC_SRCS)
+	$(CC) $(DBFLAGS) $(CFLAGS) $^ -o $(PROD_BIN)
 
 # Note: $^ stands for the names of the prerequisites separated by spaces. In this case $(PROD_SRCS)
 
@@ -40,6 +44,9 @@ run-tests: test
 
 run: production
 	./$(PROD_BIN)
+
+run-debug: debug
+	gdb $(PROD_BIN)
 
 clean:
 	rm -f $(PROD_BIN) $(TEST_BIN)
