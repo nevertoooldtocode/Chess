@@ -32,8 +32,8 @@ debug: $(PROD_SRCS) $(INC_SRCS)
 
 # Build test runner (includes math_utils.c + test file)
 
-test: $(TEST_SRCS) $(INC_SRCS) 
-	$(CC) $(CFLAGS) $^ -o $(TEST_BIN)
+test: $(TEST_SRCS) 
+	$(CC) $(DBFLAGS) $(CFLAGS) $^ -o $(TEST_BIN)
 
 # Note: $^ stands for the names of the prerequisites separated by spaces. In this case $(SRC)/math_utils.c $(TEST_SRCS)
 
@@ -42,7 +42,8 @@ test: $(TEST_SRCS) $(INC_SRCS)
 run-tests: test
 	./$(TEST_BIN)
 
-run: production
+run: production test
+	./$(TEST_BIN)
 	./$(PROD_BIN)
 
 run-debug: debug

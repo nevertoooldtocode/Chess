@@ -8,6 +8,7 @@
 #define OOBSIZE 56
 
 const field_t FIELDINDEX[BOARDSIZE] = {
+    // The indices of the actual fields in a mailbox
     21, 22, 23, 24, 25, 26, 27, 28,
     31, 32, 33, 34, 35, 36, 37, 38,
     41, 42, 43, 44, 45, 46, 47, 48,
@@ -18,6 +19,7 @@ const field_t FIELDINDEX[BOARDSIZE] = {
     91, 92, 93, 94, 95, 96, 97, 98};
 
 const field_t OOBINDEX[OOBSIZE] = {
+    // The indices of the out of bounds cells in a mailbox
     0, 1, 2, 3, 4, 5, 6, 7, 8 ,9,
     10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
     20, 29, 30, 39, 40, 49, 50, 59, 60, 69, 70, 79, 80, 89, 90, 99,
@@ -25,15 +27,24 @@ const field_t OOBINDEX[OOBSIZE] = {
     110, 111, 112, 113, 114, 115, 116, 117, 118, 119};
 
 const char PIECENAME[15] = {
+    // The names of FEN pieces, the array index is our internal Piece enum
     ' ', 'P', 'N', 'B', 'R', 'Q', 'K', ' ',
     ' ', 'p', 'n', 'b', 'r', 'q', 'k'};
 
-static char find_piecename(char p) {
+static char find_piecename_index(char p) {
+    //Finds Piece enum value for FEN piece name
     int i;
     for (i = 0; i < 15; i++) 
 	if (p == PIECENAME[i])
 	    return (char) i;
     return ' ';
+}
+
+static field_t algebraic_to_fieldindex(char file, char rank) {
+    // Translates for instance a1 to 21, and h8 to 98
+    if (file == '-') 
+	return -1;
+    return (field_t) (21 + (10 * (rank - 0x31) + (file - 0x61)));
 }
 
 board_t create_board() {
@@ -72,7 +83,7 @@ board_t create_board_from_fen(char* fen) {
 	if (fen[i] == '/');
 	else if (isdigit(fen[i])) 
 	    f -= (fen[i] - 48);
-	else b[FIELDINDEX[f--]] = find_piecename(fen[i]);
+	else b[FIELDINDEX[f--]] = find_piecename_index(fen[i]);
 	i++;
     }
     printf("fen: %s\n", fen);
