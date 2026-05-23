@@ -7,6 +7,19 @@
 #define BOARDSIZE 64
 #define OOBSIZE 56
 
+/*
+ * Board representation is a 120-cell Mailbox. The middle 64 cells are the board
+ * The outer 56 cells indicate OOB, and are also used to store additional information
+ * OOB is always negative (most significant bit 1)
+ * Extra information in OOB cells (least significant 7 bits):
+ * 	Cell 0: active color
+ * 	Cell 1: castling
+ * 	Cell 2: en passant target square
+ * 	Cell 3: number of half moves since last pawn move or capture
+ * 	Cell 4: number of full moves played
+ *
+ */
+
 const field_t FIELDINDEX[BOARDSIZE] = {
     // The indices of the actual fields in a mailbox
     21, 22, 23, 24, 25, 26, 27, 28,
@@ -16,7 +29,20 @@ const field_t FIELDINDEX[BOARDSIZE] = {
     61, 62, 63, 64, 65, 66, 67, 68,
     71, 72, 73, 74, 75, 76, 77, 78,
     81, 82, 83, 84, 85, 86, 87, 88,
-    91, 92, 93, 94, 95, 96, 97, 98};
+    91, 92, 93, 94, 95, 96, 97, 98
+};
+
+const field_t FENINDEX[BOARDSIZE] = {
+    // The indices of the FEN fields in a mailbox
+    91, 92, 93, 94, 95, 96, 97, 98,
+    81, 82, 83, 84, 85, 86, 87, 88,
+    71, 72, 73, 74, 75, 76, 77, 78,
+    61, 62, 63, 64, 65, 66, 67, 68,
+    51, 52, 53, 54, 55, 56, 57, 58,
+    41, 42, 43, 44, 45, 46, 47, 48,
+    31, 32, 33, 34, 35, 36, 37, 38,
+    21, 22, 23, 24, 25, 26, 27, 28
+};
 
 const field_t OOBINDEX[OOBSIZE] = {
     // The indices of the out of bounds cells in a mailbox
@@ -24,12 +50,14 @@ const field_t OOBINDEX[OOBSIZE] = {
     10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
     20, 29, 30, 39, 40, 49, 50, 59, 60, 69, 70, 79, 80, 89, 90, 99,
     100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 
-    110, 111, 112, 113, 114, 115, 116, 117, 118, 119};
+    110, 111, 112, 113, 114, 115, 116, 117, 118, 119
+};
 
 const char PIECENAME[15] = {
     // The names of FEN pieces, the array index is our internal Piece enum
     ' ', 'P', 'N', 'B', 'R', 'Q', 'K', ' ',
-    ' ', 'p', 'n', 'b', 'r', 'q', 'k'};
+    ' ', 'p', 'n', 'b', 'r', 'q', 'k'
+};
 
 static char find_piecename_index(char p) {
     //Finds Piece enum value for FEN piece name
@@ -69,6 +97,10 @@ void init_oob(board_t b) {
 	b[FIELDINDEX[i]] = 0;
 }
 
+color_t active_color(board_t b) {
+    return b[0] & 1;
+}
+
 int place_piece(board_t b, color_t c, piece_t p, field_t f) {
     b[f] &= 0xf0; // Make empty
     b[f] |= (c << 3);
@@ -78,14 +110,21 @@ int place_piece(board_t b, color_t c, piece_t p, field_t f) {
 
 board_t create_board_from_fen(char* fen) {
     board_t b = create_board();
-    int i = 0, f = 63;
-    while (fen[i] != ' ' && i < (int) strlen(fen)) {
+    int i = 0, f = 0, len = (int) strlen(fen);
+    // First the board
+    while (fen[i] != ' ' && i < len) {
 	if (fen[i] == '/');
 	else if (isdigit(fen[i])) 
-	    f -= (fen[i] - 48);
-	else b[FIELDINDEX[f--]] = find_piecename_index(fen[i]);
+	    f += (fen[i] - 48);
+	else b[FENINDEX[f++]] = find_piecename_index(fen[i]);
 	i++;
     }
+    // Then the active color
+    while (fen[i] == ' ') i++;
+    if (fen[++i] != 'w')
+	b[0] += 1;
+    // Then Castling permissions
+
     printf("fen: %s\n", fen);
     return b;
 }
@@ -109,7 +148,7 @@ void print_board(board_t b) {
 	    printf("%c ", PIECENAME[b[FIELDINDEX[8*r + c]]]);
 	printf("\n");
     }
-    printf("\n");
+    printf("active color: %d\n", active_color(b));
 }
 
 void print_legal_moves() {
