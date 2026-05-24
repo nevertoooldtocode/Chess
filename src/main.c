@@ -23,7 +23,7 @@ int main() {
     print_board(startposition);
     destroy_board(startposition);
 
-    startposition = create_board_from_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
+    startposition = create_board_from_fen("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b Kkq e3 1 2");
     print_mailbox(startposition);
     print_board(startposition);
     destroy_board(startposition);

@@ -53,6 +53,8 @@ const field_t OOBINDEX[OOBSIZE] = {
     110, 111, 112, 113, 114, 115, 116, 117, 118, 119
 };
 
+const char COLORNAME[2] = {'w', 'b'};
+
 const char PIECENAME[15] = {
     // The names of FEN pieces, the array index is our internal Piece enum
     ' ', 'P', 'N', 'B', 'R', 'Q', 'K', ' ',
@@ -119,12 +121,29 @@ board_t create_board_from_fen(char* fen) {
 	else b[FENINDEX[f++]] = find_piecename_index(fen[i]);
 	i++;
     }
-    // Then the active color
-    while (fen[i] == ' ') i++;
-    if (fen[++i] != 'w')
-	b[0] += 1;
-    // Then Castling permissions
 
+    // Then the active color, stored in b[0]
+    while (fen[i] == ' ') i++; // skip any additional blanks
+    if (fen[i++] != 'w')
+	b[0] += 1;
+
+    // Then Castling permissions, stored in b[1]
+    while (fen[i] == ' ') i++; // skip any additional blanks
+    while (fen[i] != ' ' && i < len) {
+	switch (fen[i++]) {
+	    case 'K': {b[1] += 8; break;}
+	    case 'Q': {b[1] += 4; break;}
+	    case 'k': {b[1] += 2; break;}
+	    case 'q': {b[1] += 1; break;}
+	}
+    }
+
+    // Then en passant target square, stored in b[2]
+    while (fen[i] == ' ') i++; // skip any additional blanks
+    if (fen[i] != '-') 
+	b[2] += algebraic_to_fieldindex(fen[i], fen[i+1]);
+    i += 2;
+    
     printf("fen: %s\n", fen);
     return b;
 }
@@ -148,7 +167,7 @@ void print_board(board_t b) {
 	    printf("%c ", PIECENAME[b[FIELDINDEX[8*r + c]]]);
 	printf("\n");
     }
-    printf("active color: %d\n", active_color(b));
+    printf("active color: %c, castling: %d, ep target square: %d\n", COLORNAME[active_color(b)], b[1] & 0x7f, b[2] & 0x7f);
 }
 
 void print_legal_moves() {
