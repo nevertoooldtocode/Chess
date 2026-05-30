@@ -20,8 +20,8 @@
  *
  */
 
-const field_t FIELDINDEX[BOARDSIZE] = {
-    // The indices of the actual fields in a mailbox
+const square_t SQUAREINDEX[BOARDSIZE] = {
+    // The indices of the actual squares in a mailbox
     21, 22, 23, 24, 25, 26, 27, 28,
     31, 32, 33, 34, 35, 36, 37, 38,
     41, 42, 43, 44, 45, 46, 47, 48,
@@ -32,8 +32,8 @@ const field_t FIELDINDEX[BOARDSIZE] = {
     91, 92, 93, 94, 95, 96, 97, 98
 };
 
-const field_t FENINDEX[BOARDSIZE] = {
-    // The indices of the FEN fields in a mailbox
+const square_t FENINDEX[BOARDSIZE] = {
+    // The indices of the FEN squares in a mailbox
     91, 92, 93, 94, 95, 96, 97, 98,
     81, 82, 83, 84, 85, 86, 87, 88,
     71, 72, 73, 74, 75, 76, 77, 78,
@@ -44,7 +44,7 @@ const field_t FENINDEX[BOARDSIZE] = {
     21, 22, 23, 24, 25, 26, 27, 28
 };
 
-const field_t OOBINDEX[OOBSIZE] = {
+const square_t OOBINDEX[OOBSIZE] = {
     // The indices of the out of bounds cells in a mailbox
     0, 1, 2, 3, 4, 5, 6, 7, 8 ,9,
     10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -70,16 +70,32 @@ static char find_piecename_index(char p) {
     return ' ';
 }
 
-static field_t algebraic_to_fieldindex(char file, char rank) {
+static square_t algebraic_to_fieldindex(char file, char rank) {
     // Translates for instance a1 to 21, and h8 to 98
     if (file == '-') 
 	return -1;
-    return (field_t) (21 + (10 * (rank - 0x31) + (file - 0x61)));
+    return (square_t) (21 + (10 * (rank - 0x31) + (file - 0x61)));
+}
+
+static char square_file(square_t s) {
+    return 0x60 + (s % 10);
+}
+
+static char square_rank(square_t s) {
+    return 0x31 -2 + (s / 10);
+}
+
+static void init_oob(board_t b) {
+    int i;
+    for (i = 0; i < OOBSIZE; i++)
+	b[OOBINDEX[i]] = -128;
+    for (i = 0; i < BOARDSIZE; i++)
+	b[SQUAREINDEX[i]] = 0;
 }
 
 board_t create_board() {
     board_t b;
-    b = (board_t) malloc(MAILBOXSIZE * sizeof(field_t));
+    b = (board_t) malloc(MAILBOXSIZE * sizeof(square_t));
     if (b == NULL) {
 	printf("error in create_board\n");
 	exit(1);
@@ -91,19 +107,16 @@ board_t create_board() {
 void destroy_board(board_t b) {
     free(b);
 }
-void init_oob(board_t b) {
-    int i;
-    for (i = 0; i < OOBSIZE; i++)
-	b[OOBINDEX[i]] = -128;
-    for (i = 0; i < BOARDSIZE; i++)
-	b[FIELDINDEX[i]] = 0;
-}
 
 color_t active_color(board_t b) {
     return b[0] & 1;
 }
 
-int place_piece(board_t b, color_t c, piece_t p, field_t f) {
+square_t ep_target_square(board_t b) {
+    return b[2] & 0x7f;
+}
+
+int place_piece(board_t b, color_t c, piece_t p, square_t f) {
     b[f] &= 0xf0; // Make empty
     b[f] |= (c << 3);
     b[f] |= p;
@@ -159,17 +172,26 @@ void print_mailbox(board_t b) {
     printf("\n");
 }
 
+void print_square(square_t s) {
+    char f = square_file(s), r = square_rank(s);
+    if (f >= 0x61 && f <= 0x68 && r >= 0x31 && r <= 0x38)
+	printf("%c%c", f, r);
+}
+
 void print_board(board_t b) {
     printf("Print board:\n");
     int r, c;
     for (r = 7; r >= 0; r--) {
 	for (c = 0; c < 8; c++)
-	    printf("%c ", PIECENAME[b[FIELDINDEX[8*r + c]]]);
+	    printf("%c ", PIECENAME[b[SQUAREINDEX[8*r + c]]]);
 	printf("\n");
     }
-    printf("active color: %c, castling: %d, ep target square: %d\n", COLORNAME[active_color(b)], b[1] & 0x7f, b[2] & 0x7f);
+    printf("active color: %c, castling: %d, ep target square: ", COLORNAME[active_color(b)], b[1] & 0x7f);
+    print_square(ep_target_square(b));
+    printf("\n");
 }
 
-void print_legal_moves() {
+void print_legal_moves(board_t b) {
+    color_t ac = active_color(b);
     printf("Legal moves!\n");
 }
