@@ -178,6 +178,10 @@ void print_square(square_t s) {
 	printf("%c%c", f, r);
 }
 
+void print_piece(char piece) {
+    printf("%c", PIECENAME[piece]);
+}
+
 void print_board(board_t b) {
     printf("Print board:\n");
     int r, c;
@@ -193,5 +197,46 @@ void print_board(board_t b) {
 
 void print_legal_moves(board_t b) {
     color_t ac = active_color(b);
+    int i;
+    char piece;
+    if (ac == White) {
+	for (i = 0; i < BOARDSIZE; i++) {
+	    piece = b[SQUAREINDEX[i]] & 0x07;
+	    switch (piece) {
+		case Empty:
+		    break;
+		case Rook:
+		    print_piece(piece);
+		    print_square(SQUAREINDEX[i]);
+		    printf(", ");
+		    break;
+		case Knight:
+		    print_piece(piece);
+		    print_square(SQUAREINDEX[i]);
+		    printf(", ");
+		    break;
+		case Bishop:
+		    print_piece(piece);
+		    print_square(SQUAREINDEX[i]);
+		    printf(", ");
+		    break;
+		case Queen:
+		    print_piece(piece);
+		    print_square(SQUAREINDEX[i]);
+		    printf(", ");
+		    break;
+		case King:
+		    print_piece(piece);
+		    print_square(SQUAREINDEX[i]);
+		    printf(", ");
+		    break;
+		case Pawn:
+		    print_piece(piece);
+		    print_square(SQUAREINDEX[i]);
+		    printf(", ");
+		    break;
+	    }
+	}
+    }
     printf("Legal moves!\n");
 }
