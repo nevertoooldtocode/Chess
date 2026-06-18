@@ -179,7 +179,7 @@ void print_square(square_t s) {
 }
 
 void print_piece(char piece) {
-    printf("%c", PIECENAME[piece]);
+    printf("%c", PIECENAME[(int) piece]);
 }
 
 void print_board(board_t b) {
@@ -238,5 +238,5 @@ void print_legal_moves(board_t b) {
 	    }
 	}
     }
-    printf("Legal moves!\n");
+    printf("\nLegal moves!\n");
 }
